@@ -12,3 +12,8 @@ export const useCheckSessionQuery = () => {
         queryFn: checkSession
     });
 };
+
+export const useCurrentUser = () => {
+    const session = useCheckSessionQuery();    
+    return session.data?.data.user;
+}

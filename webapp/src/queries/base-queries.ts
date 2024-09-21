@@ -1,6 +1,31 @@
-import { useMutation, UseMutationOptions, useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { QueryKey, useMutation, UseMutationOptions, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
+import { supabase } from "../supabase-client";
 
-export const useAppQuery = <TQueryFnData = unknown, TError = unknown, TData = TQueryFnData>(options: UseQueryOptions<TQueryFnData, TError, TData>) => {
+type SupabaseSubscribeOptions = {
+    event: '*';
+    schema: string;
+    table: string;
+    filter?: string;
+    enabled?: boolean;
+}
+
+type AppQueryOptions<TQueryFnData, TError, TData> = UseQueryOptions<TQueryFnData, TError, TData> & {
+    subscribe?: SupabaseSubscribeOptions;
+}
+
+const supabaseSubscribe = (queryKey: QueryKey, options: SupabaseSubscribeOptions) => {
+    const queryClient = useQueryClient();
+    const handleChange = (payload: any) => {
+        console.log(payload);
+        queryClient.invalidateQueries({ queryKey: queryKey });
+    }
+    supabase.channel(queryKey.join('-')).on('postgres_changes', options, handleChange).subscribe();
+}
+
+export const useAppQuery = <TQueryFnData = unknown, TError = unknown, TData = TQueryFnData>(options: AppQueryOptions<TQueryFnData, TError, TData>) => {
+    if (options.subscribe && options.subscribe.enabled) {
+        supabaseSubscribe(options.queryKey, options.subscribe);
+    }
     return useQuery<TQueryFnData, TError, TData>({
         ...options,
     });

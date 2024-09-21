@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "update-types": "npx supabase gen types typescript --local > webapp/src/database.types.ts"
   },
   "author": "",
   "license": "ISC",
