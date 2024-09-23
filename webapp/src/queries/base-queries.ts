@@ -1,6 +1,8 @@
 import { QueryKey, useMutation, UseMutationOptions, useQuery, useQueryClient, UseQueryOptions } from "@tanstack/react-query";
 import { supabase } from "../supabase-client";
 
+const channelMap = new Map<string, boolean>();
+
 type SupabaseSubscribeOptions = {
     event: '*';
     schema: string;
@@ -13,13 +15,20 @@ type AppQueryOptions<TQueryFnData, TError, TData> = UseQueryOptions<TQueryFnData
     subscribe?: SupabaseSubscribeOptions;
 }
 
+
 const supabaseSubscribe = (queryKey: QueryKey, options: SupabaseSubscribeOptions) => {
     const queryClient = useQueryClient();
     const handleChange = (payload: any) => {
         console.log(payload);
         queryClient.invalidateQueries({ queryKey: queryKey });
     }
-    supabase.channel(queryKey.join('-')).on('postgres_changes', options, handleChange).subscribe();
+    const channelName = queryKey.join('-');
+
+    if (channelMap.has(channelName)) {
+        return;
+    }
+    channelMap.set(channelName, true);
+    supabase.channel(channelName).on('postgres_changes', options, handleChange).subscribe();
 }
 
 export const useAppQuery = <TQueryFnData = unknown, TError = unknown, TData = TQueryFnData>(options: AppQueryOptions<TQueryFnData, TError, TData>) => {

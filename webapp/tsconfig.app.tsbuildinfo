@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/database.types.ts","./src/main.tsx","./src/supabase-client.ts","./src/vite-env.d.ts","./src/queries/base-queries.ts","./src/queries/auth/login.ts","./src/queries/auth/logout.ts","./src/queries/auth/session.ts","./src/queries/jobs/create.ts","./src/queries/jobs/get.ts"],"version":"5.6.2"}
