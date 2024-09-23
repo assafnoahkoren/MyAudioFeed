@@ -19,7 +19,6 @@ export const useMyJobsQuery = () => {
             event: '*',
             schema: 'public',
             table: 'jobs',
-            filter: `owner_id=eq.${user?.id}`,
             enabled: !!user
         },
         enabled: !!user
